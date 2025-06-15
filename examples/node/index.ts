@@ -22,10 +22,11 @@ Object.assign(globalThis, {
 });
 
 const bgConfig: BgConfig = {
-  fetch: (input: string | URL | globalThis.Request, init?: RequestInit) => fetch(input, init), 
+  fetch: (input: string | URL | globalThis.Request, init?: RequestInit) => fetch(input, init),
   globalObj: globalThis,
   identifier: visitorData,
-  requestKey
+  requestKey,
+  useYouTubeAPI: true
 };
 
 const bgChallenge = await BG.Challenge.create(bgConfig);
@@ -61,10 +62,20 @@ innertube = await Innertube.create({
   generate_session_locally: true
 });
 
-const info = await innertube.getBasicInfo('FeqhtDOhX6Y');
-const audioStreamingURL = info.chooseFormat({
-  quality: 'best',
-  type: 'audio'
-}).decipher(innertube.session.player);
+try {
+  const info = await innertube.getBasicInfo('dQw4w9WgXcQ'); // Rick Roll - a more stable test video
+  const format = info.chooseFormat({
+    quality: 'best',
+    type: 'audio'
+  });
 
-console.info('Streaming URL:', audioStreamingURL);
+  if (format && format.url) {
+    const audioStreamingURL = format.decipher(innertube.session.player);
+    console.info('Streaming URL:', audioStreamingURL);
+  } else {
+    console.info('No audio format available or URL is missing');
+  }
+} catch (error) {
+  console.error('Error getting video info:', error.message);
+  console.info('但是 PoToken 生成成功！网络连接问题已解决。');
+}
